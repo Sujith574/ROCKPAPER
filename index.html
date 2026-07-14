@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Rock Paper Scissors Arena – A modern, feature-rich Rock Paper Scissors game with difficulty levels, stats, and animations." />
+  <title>Rock Paper Scissors Arena</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+</head>
+<body>
+
+  <!-- ========== CONFETTI CONTAINER ========== -->
+  <div id="confetti-container" aria-hidden="true"></div>
+
+  <!-- ========== HEADER ========== -->
+  <header class="site-header">
+    <div class="header-glow" aria-hidden="true"></div>
+    <h1 class="site-title">
+      <span class="title-icon">🎮</span>
+      Rock Paper Scissors <span class="highlight">Arena</span>
+    </h1>
+    <p class="site-subtitle">Play Against the Computer</p>
+
+    <!-- Difficulty Selector -->
+    <div class="difficulty-bar">
+      <span class="diff-label">Difficulty:</span>
+      <div class="diff-buttons" role="group" aria-label="Difficulty level">
+        <button class="diff-btn active" data-diff="easy"   id="diff-easy"   aria-pressed="true">Easy</button>
+        <button class="diff-btn"        data-diff="medium" id="diff-medium" aria-pressed="false">Medium</button>
+        <button class="diff-btn"        data-diff="hard"   id="diff-hard"   aria-pressed="false">Hard</button>
+      </div>
+      <span class="diff-indicator" id="diff-indicator">🟢 Easy Mode</span>
+    </div>
+
+    <!-- Keyboard shortcuts hint -->
+    <p class="keyboard-hint" aria-label="Keyboard shortcuts">
+      ⌨️ Shortcuts: <kbd>R</kbd> Rock &nbsp;|&nbsp; <kbd>P</kbd> Paper &nbsp;|&nbsp; <kbd>S</kbd> Scissors &nbsp;|&nbsp; <kbd>N</kbd> New Game
+    </p>
+  </header>
+
+  <!-- ========== MAIN GAME WRAPPER ========== -->
+  <main class="game-wrapper">
+
+    <!-- ===== SCOREBOARD ===== -->
+    <section class="scoreboard glass-card" aria-label="Scoreboard">
+      <div class="score-item">
+        <span class="score-label">Player</span>
+        <span class="score-value player-score" id="player-score">0</span>
+      </div>
+      <div class="score-divider">
+        <span class="vs-badge">VS</span>
+        <span class="games-played" id="games-played-label">0 Games</span>
+      </div>
+      <div class="score-item">
+        <span class="score-label">Computer</span>
+        <span class="score-value computer-score" id="computer-score">0</span>
+      </div>
+      <div class="score-item draws-item">
+        <span class="score-label">Draws</span>
+        <span class="score-value draw-score" id="draw-score">0</span>
+      </div>
+    </section>
+
+    <!-- ===== CHOICE AREA ===== -->
+    <section class="choice-section" aria-label="Make your choice">
+      <h2 class="section-title">Choose Your Weapon</h2>
+      <div class="choice-buttons" role="group" aria-label="Game choices">
+        <button class="choice-btn" data-choice="rock"     id="btn-rock"     aria-label="Rock">
+          <span class="choice-emoji">🪨</span>
+          <span class="choice-name">Rock</span>
+          <span class="choice-shortcut">R</span>
+        </button>
+        <button class="choice-btn" data-choice="paper"    id="btn-paper"    aria-label="Paper">
+          <span class="choice-emoji">📄</span>
+          <span class="choice-name">Paper</span>
+          <span class="choice-shortcut">P</span>
+        </button>
+        <button class="choice-btn" data-choice="scissors" id="btn-scissors" aria-label="Scissors">
+          <span class="choice-emoji">✂️</span>
+          <span class="choice-name">Scissors</span>
+          <span class="choice-shortcut">S</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- ===== BATTLE ARENA ===== -->
+    <section class="battle-arena glass-card" id="battle-arena" aria-live="polite" aria-label="Battle result">
+
+      <!-- Idle state -->
+      <div class="idle-state" id="idle-state">
+        <p class="idle-text">Select a weapon to begin the battle!</p>
+        <div class="idle-icons" aria-hidden="true">🪨 &nbsp; 📄 &nbsp; ✂️</div>
+      </div>
+
+      <!-- Loading state -->
+      <div class="loading-state hidden" id="loading-state" aria-label="Computer is thinking">
+        <div class="spinner" aria-hidden="true"></div>
+        <p class="loading-text">Computer is thinking<span class="dots"></span></p>
+      </div>
+
+      <!-- Battle result state -->
+      <div class="result-state hidden" id="result-state">
+        <div class="battle-display">
+          <div class="battle-side player-side">
+            <div class="battle-label">Your Choice</div>
+            <div class="battle-emoji" id="player-choice-display" aria-live="polite">–</div>
+            <div class="battle-name"  id="player-choice-name">–</div>
+          </div>
+          <div class="battle-center">
+            <span class="battle-vs" aria-hidden="true">⚔️</span>
+          </div>
+          <div class="battle-side computer-side">
+            <div class="battle-label">Computer's Choice</div>
+            <div class="battle-emoji" id="computer-choice-display" aria-live="polite">❓</div>
+            <div class="battle-name"  id="computer-choice-name">–</div>
+          </div>
+        </div>
+
+        <!-- Result banner -->
+        <div class="result-banner" id="result-banner" aria-live="assertive">
+          <span class="result-text" id="result-text"></span>
+          <span class="result-emoji" id="result-emoji"></span>
+        </div>
+
+        <!-- Motivational message -->
+        <p class="motivational-msg" id="motivational-msg"></p>
+
+        <!-- Action buttons -->
+        <div class="action-buttons">
+          <button class="action-btn btn-play-again" id="btn-play-again">🔄 Play Again</button>
+          <button class="action-btn btn-reset"      id="btn-reset-score">🗑️ Reset Score</button>
+          <button class="action-btn btn-new-game"   id="btn-new-game">🆕 New Game</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== STATS + HISTORY ROW ===== -->
+    <div class="stats-history-row">
+
+      <!-- Advanced Statistics -->
+      <section class="stats-panel glass-card" aria-label="Advanced Statistics">
+        <h3 class="panel-title">📊 Advanced Stats</h3>
+        <div class="stat-grid">
+          <div class="stat-item">
+            <span class="stat-label">Win %</span>
+            <div class="stat-bar-wrap">
+              <div class="stat-bar win-bar" id="win-bar"></div>
+            </div>
+            <span class="stat-pct" id="win-pct">0%</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">Loss %</span>
+            <div class="stat-bar-wrap">
+              <div class="stat-bar loss-bar" id="loss-bar"></div>
+            </div>
+            <span class="stat-pct" id="loss-pct">0%</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">Draw %</span>
+            <div class="stat-bar-wrap">
+              <div class="stat-bar draw-bar" id="draw-bar"></div>
+            </div>
+            <span class="stat-pct" id="draw-pct">0%</span>
+          </div>
+        </div>
+        <div class="streak-info">
+          <div class="streak-item">
+            <span class="streak-label">🔥 Current Streak</span>
+            <span class="streak-value" id="current-streak">0</span>
+          </div>
+          <div class="streak-item">
+            <span class="streak-label">🏆 Best Streak</span>
+            <span class="streak-value" id="best-streak">0</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Recent History -->
+      <section class="history-panel glass-card" aria-label="Game History">
+        <h3 class="panel-title">🕹️ Last 5 Results</h3>
+        <ul class="history-list" id="history-list" aria-label="Recent game results">
+          <li class="history-empty">No games played yet</li>
+        </ul>
+        <div class="full-history-toggle">
+          <button class="toggle-history-btn" id="toggle-history-btn" aria-expanded="false">
+            📜 View Full History
+          </button>
+        </div>
+      </section>
+
+    </div>
+
+    <!-- Full History Modal -->
+    <div class="full-history-panel glass-card hidden" id="full-history-panel" aria-label="Full game history">
+      <div class="panel-header">
+        <h3 class="panel-title">📜 Full Game History</h3>
+        <button class="close-history-btn" id="close-history-btn" aria-label="Close history">✕</button>
+      </div>
+      <ul class="history-list full-history-list" id="full-history-list"></ul>
+      <p class="history-empty-msg hidden" id="full-history-empty">No games played yet.</p>
+    </div>
+
+    <!-- ===== GAME RULES ===== -->
+    <section class="rules-card glass-card" aria-label="Game Rules">
+      <h3 class="panel-title">📖 Game Rules</h3>
+      <ul class="rules-list">
+        <li><span class="rule-icon">🪨</span> Rock beats Scissors</li>
+        <li><span class="rule-icon">✂️</span> Scissors beats Paper</li>
+        <li><span class="rule-icon">📄</span> Paper beats Rock</li>
+        <li><span class="rule-icon">🤝</span> Same choice → Draw</li>
+      </ul>
+    </section>
+
+  </main>
+
+  <!-- ========== FOOTER ========== -->
+  <footer class="site-footer">
+    <p>Rock Paper Scissors Arena &copy; 2025 &nbsp;|&nbsp; Built with ❤️ using Vanilla JS</p>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
